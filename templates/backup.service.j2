@@ -1,0 +1,12 @@
+{{ ansible_managed | comment }}
+[Unit]
+Description=Run restic backup
+Wants=network-online.target
+After=network.target network-online.target
+{% for item in restic_service_unit_extra_options %}
+{{ item }}
+{% endfor %}
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/backup

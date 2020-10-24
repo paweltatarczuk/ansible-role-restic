@@ -1,0 +1,50 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: docker
+lint:
+  name: yamllint
+platforms:
+  - name: instance
+    image: jrei/systemd-debian:10
+    capabilities:
+      - NET_ADMIN
+    networks:
+      - name: private
+    privileged: True
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    command: /lib/systemd/systemd
+  - name: minio
+    image: minio/minio
+    networks:
+      - name: private
+    command: minio server /data
+    env:
+      MINIO_ACCESS_KEY: minio
+      MINIO_SECRET_KEY: minio123
+  - name: mc
+    image: minio/mc
+    networks:
+      - name: private
+    entrypoint:
+provisioner:
+  name: ansible
+  lint:
+    name: ansible-lint
+  inventory:
+    group_vars:
+      all:
+    host_vars:
+      instance:
+        restic_backup_source_dir: /home
+        restic_s3_bucket: http://minio:9000/test
+        restic_password: secret123
+        restic_aws_access_key_id: minio
+        restic_aws_access_secret_key: minio123
+      minio:
+verifier:
+  name: testinfra
+  lint:
+    name: flake8

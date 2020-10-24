@@ -1,0 +1,8 @@
+---
+- name: Set up minio
+  hosts: mc
+  tasks:
+    - name: Create test bucket
+      shell: |
+        mc config host add myminio http://minio:9000 minio minio123;
+        /usr/bin/mc mb myminio/test;

@@ -1,0 +1,24 @@
+#!/bin/bash
+# This file is managed by Ansible
+set -e -o noglob
+
+set -o allexport
+source /etc/backup/config
+source /etc/backup/credentials
+set +o allexport
+
+function run_dir() {
+  ls -1 "$1" | while read SCRIPT; do
+    echo "Run $SCRIPT:"
+    "$1/$SCRIPT"
+  done
+}
+
+# Run pre scripts
+[ ! -d /etc/backup/pre.d ] || run_dir "/etc/backup/pre.d"
+
+# Run duplicity
+/usr/bin/restic backup --verbose "$SOURCE"
+
+# Run post scripts
+[ ! -d /etc/backup/post.d ] || run_dir "/etc/backup/post.d"

@@ -1,0 +1,70 @@
+---
+# tasks file for ansible-role-restic
+- name: Ensure restic is present
+  apt:
+    name: restic
+    state: present
+
+- name: Ensure backup script is present
+  copy:
+    src: backup
+    dest: /usr/local/bin/backup
+    mode: '755'
+
+- name: Ensure config directory is present
+  file:
+    path: /etc/backup
+    state: directory
+    mode: '755'
+
+- name: Ensure config file is present
+  template:
+    src: config.j2
+    dest: /etc/backup/config
+    mode: '644'
+
+- name: Ensure credentials file is present
+  template:
+    src: credentials.j2
+    dest: /etc/backup/credentials
+    mode: '600'
+
+- name: Ensure backup service is present
+  template:
+    src: backup.service.j2
+    dest: /etc/systemd/system/backup.service
+    mode: '644'
+  notify: Disable backup service
+
+- name: Ensure backup timer is present
+  template:
+    src: backup.timer.j2
+    dest: /etc/systemd/system/backup.timer
+    mode: '644'
+  notify: Enable backup timer
+
+- name: Verify backup registry is initialized
+  shell: |
+    set -o allexport
+    source /etc/backup/config
+    source /etc/backup/credentials
+    set +o allexport
+
+    restic snapshots;
+  args:
+    executable: /bin/bash
+  register: verify
+  changed_when: verify.rc != 0
+  failed_when: "'unable to open config file' not in verify.stderr and verify.rc != 0"
+
+- name: Ensure backup registry is initialized
+  shell: |
+    set -o allexport
+    source /etc/backup/config
+    source /etc/backup/credentials
+    set +o allexport
+
+    restic init;
+  args:
+    executable: /bin/bash
+  when: verify.rc != 0

@@ -1,0 +1,17 @@
+---
+galaxy_info:
+  author: Paweł Tatarczuk
+  description: Simple role for provisioning restic backups to S3-compatible object storage
+
+  license: BSD
+
+  min_ansible_version: 2.9.2
+
+  platforms:
+    - name: Debian
+      versions:
+        - 10
+
+  galaxy_tags: []
+
+dependencies: []

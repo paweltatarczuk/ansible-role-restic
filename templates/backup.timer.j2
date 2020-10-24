@@ -1,0 +1,15 @@
+{{ ansible_managed | comment }}
+[Unit]
+Description=Run weekly backup
+After=network.target
+{% for item in restic_timer_unit_extra_options %}
+{{ item }}
+{% endfor %}
+
+
+[Timer]
+OnBootSec=15min
+OnUnitActiveSec=1w
+
+[Install]
+WantedBy=timers.target

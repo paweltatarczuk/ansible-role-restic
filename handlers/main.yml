@@ -1,0 +1,25 @@
+---
+# handlers file for ansible-role-restic
+- name: Disable backup service
+  systemd:
+    name: backup.service
+    enabled: false
+    daemon_reload: true
+
+- name: Enable backup timer
+  systemd:
+    name: backup.timer
+    enabled: true
+    state: started
+    daemon_reload: true
+
+- name: Initialize backup registry
+  shell: |
+    set -o allexport
+    source /etc/backup/config
+    source /etc/backup/credentials
+    set +o allexport
+
+    restic init;
+  args:
+    executable: /bin/bash

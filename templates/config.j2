@@ -1,0 +1,3 @@
+{{ ansible_managed | comment }}
+SOURCE="{{ restic_backup_source_dir }}"
+RESTIC_REPOSITORY="s3:{{ restic_s3_bucket }}"
