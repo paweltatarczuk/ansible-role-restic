@@ -4,6 +4,7 @@ restic_service_unit_extra_options: []
 restic_timer_unit_extra_options: []
 restic_backup_source_dir: /home
 restic_s3_bucket: s3.example.com/test-bucket
+restic_s3_region: eu-west-1
 restic_password: secret
 restic_aws_access_key_id:
 restic_aws_access_secret_key:
