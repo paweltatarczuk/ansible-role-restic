@@ -3,11 +3,11 @@
 Description=Run restic backup
 Wants=network-online.target
 After=network.target network-online.target
-User=root
 {% for item in restic_service_unit_extra_options %}
 {{ item }}
 {% endfor %}
 
 [Service]
+User=root
 Type=oneshot
 ExecStart=/usr/local/bin/backup
