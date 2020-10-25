@@ -2,9 +2,9 @@
 # tasks file for ansible-role-restic
 - name: Set architecture fact
   set_fact:
-    restic_arch: "{{ 'arm64' if ansible_architecture == 'armv7l' else 'amd64' }}"
+    restic_arch: "{{ 'arm' if ansible_architecture == 'armv7l' else 'amd64' }}"
     restic_arch_checksums:
-      arm64: sha256:35e6e7e783afa5c5397acfde3b9237a5b1ace0cf4d0d3bf3f2d77ff601cd5157
+      arm: sha256:35e6e7e783afa5c5397acfde3b9237a5b1ace0cf4d0d3bf3f2d77ff601cd5157
       amd64: sha256:41d47f100f61c503c462f53069e5c2aaad4dafec461e56b85b1de7730e4f9c4d
 
 - name: Verify restic is present
