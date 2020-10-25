@@ -18,7 +18,7 @@ function run_dir() {
 [ ! -d /etc/backup/pre.d ] || run_dir "/etc/backup/pre.d"
 
 # Run duplicity
-/usr/bin/restic backup --verbose "$SOURCE"
+/usr/local/bin/restic backup --verbose "$SOURCE"
 
 # Run post scripts
 [ ! -d /etc/backup/post.d ] || run_dir "/etc/backup/post.d"

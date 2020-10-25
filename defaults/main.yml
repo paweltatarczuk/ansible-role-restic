@@ -1,5 +1,6 @@
 ---
 # defaults file for ansible-role-restic
+restic_version: 0.10.0
 restic_service_unit_extra_options: []
 restic_timer_unit_extra_options: []
 restic_backup_source_dir: /home

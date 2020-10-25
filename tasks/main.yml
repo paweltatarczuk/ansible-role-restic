@@ -1,9 +1,41 @@
 ---
 # tasks file for ansible-role-restic
-- name: Ensure restic is present
-  apt:
-    name: restic
-    state: present
+- name: Set architecture fact
+  set_fact:
+    restic_arch: "{{ 'arm64' if ansible_architecture == 'armv7l' else 'amd64' }}"
+    restic_arch_checksums:
+      arm64: sha256:35e6e7e783afa5c5397acfde3b9237a5b1ace0cf4d0d3bf3f2d77ff601cd5157
+      amd64: sha256:41d47f100f61c503c462f53069e5c2aaad4dafec461e56b85b1de7730e4f9c4d
+
+- name: Verify restic is present
+  stat:
+    path: /usr/local/bin/restic
+  register: restic_binary_present
+  changed_when: not restic_binary_present.stat.exists
+
+- name: Verify restic version
+  command: restic version
+  when: restic_binary_present is not changed
+  register: restic_binary_version
+  changed_when: restic_binary_version is failed or 'restic {{ restic_version }}' not in restic_binary_version.stdout
+  failed_when: false
+
+- name: Fetch restic binary archive
+  get_url:
+    url: https://github.com/restic/restic/releases/download/v{{ restic_version }}/restic_{{ restic_version }}_linux_{{ restic_arch }}.bz2
+    dest: /usr/local/src/restic_{{ restic_version }}_linux_{{ restic_arch }}.bz2
+    checksum: "{{ restic_arch_checksums[restic_arch] }}"
+  when: restic_binary_present is changed or restic_binary_version is changed
+
+- name: Extract restic binary
+  shell: bunzip2 -c /usr/local/src/restic_{{ restic_version }}_linux_{{ restic_arch }}.bz2 > /usr/local/bin/restic
+  when: restic_binary_present is changed or restic_binary_version is changed
+
+- name: Ensure restic binary is executable
+  file:
+    path: /usr/local/bin/restic
+    state: file
+    mode: '755'
 
 - name: Ensure backup script is present
   copy:
