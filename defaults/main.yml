@@ -9,3 +9,4 @@ restic_s3_region: eu-west-1
 restic_password: secret
 restic_aws_access_key_id:
 restic_aws_access_secret_key:
+restic_glacier_storage: True

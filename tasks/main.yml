@@ -100,3 +100,35 @@
   args:
     executable: /bin/bash
   when: verify.rc != 0
+
+- name: Ensure awscli is present
+  package:
+    name: awscli
+    state: present
+  when: restic_glacier_storage
+
+- name: Ensure jq is present
+  package:
+    name: jq
+    state: present
+  when: restic_glacier_storage
+
+- name: Ensure post.d directory is present
+  file:
+    path: /etc/backup/post.d
+    mode: '644'
+    state: directory
+  when: restic_glacier_storage
+
+- name: Ensure glacier post script is present
+  copy:
+    src: glacier
+    dest: /etc/backup/post.d/glacier
+    mode: '755'
+  when: restic_glacier_storage
+
+- name: Ensure glacier post script is absent
+  file:
+    path: /etc/backup/post.d/glacier
+    state: absent
+  when: not restic_glacier_storage

@@ -1,0 +1,21 @@
+#!/bin/bash
+# This file is managed by Ansible
+set -e -o noglob -o pipefail
+
+ENDPOINT="https://$(echo "${RESTIC_REPOSITORY#s3:}" | cut -f1 -d/)"
+BUCKET="$(echo "${RESTIC_REPOSITORY#s3:}" | cut -f2 -d/)"
+
+function list {
+  aws \
+    --endpoint-url "$ENDPOINT" \
+    s3api list-objects \
+        --query 'Contents[?StorageClass==`STANDARD`]' \
+        --bucket $BUCKET \
+        --prefix data/
+}
+
+while [ $(list 1 | jq '. | length') -ge 1 ]; do
+  list 100 \
+  | jq '.[].Key' \
+  | xargs -n 1 -i aws s3 --endpoint-url "$ENDPOINT" cp "s3://$BUCKET/{}" "s3://$BUCKET/{}" --storage-class GLACIER
+done
